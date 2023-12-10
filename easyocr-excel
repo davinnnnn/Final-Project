@@ -1,0 +1,31 @@
+import os
+import easyocr
+import pandas as pd
+
+# 한국어 지원을 위해 EasyOCR reader 생성
+reader = easyocr.Reader(['ko'])
+
+# 이미지 파일이 있는 폴더 경로 지정
+folder_path = '/content/drive/MyDrive/screenshots'
+
+# 폴더 내 모든 이미지 파일 목록 가져오기
+image_files = [f for f in os.listdir(folder_path) if f.endswith(('.png', '.jpg', '.jpeg'))]
+
+# 추출된 텍스트를 저장할 리스트 초기화
+extracted_texts = []
+
+# 각 이미지 파일에 대해 OCR 수행
+for file in image_files:
+    file_path = os.path.join(folder_path, file)
+    results = reader.readtext(file_path, detail=0)
+    extracted_text = "\n".join(results)
+    extracted_texts.append({'Filename': file, 'Text': extracted_text})
+
+# 결과를 DataFrame으로 변환
+df = pd.DataFrame(extracted_texts)
+
+# DataFrame을 Excel 파일로 저장
+excel_path = '/content/drive/MyDrive/extracted_texts.xlsx'
+df.to_excel(excel_path, index=False)
+
+print("OCR 작업 완료: 추출된 텍스트가 저장된 Excel 파일이 생성되었습니다.")
